@@ -21,7 +21,7 @@ prepare_host() {
     }
     systemctl enable --now --quiet prometheus-node-exporter
     CHANGED=false
-    install_file "$ROOT_DIR/config/journald.conf" /etc/systemd/journald.conf.d/temporal-v6.conf 0644
+    install_file "$ROOT_DIR/config/journald.conf" /etc/systemd/journald.conf.d/temporalScale.conf 0644
     if $CHANGED; then systemctl restart systemd-journald; fi
     [[ -d /etc/rsyslog.d ]] || return 0
     CHANGED=false
@@ -90,7 +90,7 @@ first_activation() {
 
 # Remove leftovers of interrupted installs and keep every release root-owned and read-only for others
 clean_staging() {
-    find "$TEMPORAL_HOME/releases" "$TEMPORAL_HOME/cli" -maxdepth 1 -name '.temporal-v6.*' -mmin +60 -exec rm -rf {} +
+    find "$TEMPORAL_HOME/releases" "$TEMPORAL_HOME/cli" -maxdepth 1 -name '.temporalScale.*' -mmin +60 -exec rm -rf {} +
     chown -R root:root "$TEMPORAL_HOME/releases" "$TEMPORAL_HOME/cli"
     chmod -R u=rwX,go=rX "$TEMPORAL_HOME/releases" "$TEMPORAL_HOME/cli"
 }

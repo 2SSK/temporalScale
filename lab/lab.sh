@@ -37,10 +37,12 @@ lab_ssh() {
 # Copy the project (as rsync would on a server) plus temporal.env as .env
 push_files() {
     ip=$1
-    lab_ssh "$ip" 'rm -rf temporal-v6 && mkdir temporal-v6'
-    tar -C "$LAB_DIR/.." -cf - scripts config compose.yaml .env.example | lab_ssh "$ip" 'tar -C temporal-v6 -xf -'
-    lab_ssh "$ip" 'umask 077 && cat > temporal-v6/.env' <"$LAB_DIR/temporal.env"
-    echo "pushed temporal-v6 to deploy@$ip"
+    lab_ssh "$ip" 'rm -rf temporalScale && mkdir temporalScale'
+    tar -C "$LAB_DIR/.." -cf - scripts config compose.yaml .env.example | lab_ssh "$ip" 'tar -C temporalScale -xf -'
+    lab_ssh "$ip" 'umask 077 && cat > temporalScale/.env' <"$LAB_DIR/temporal.env"
+    # the tar list above is an allowlist, so lab/ cannot ship; assert it anyway
+    lab_ssh "$ip" 'test ! -e temporalScale/lab || { echo "lab/ leaked into temporalScale" >&2; exit 1; }'
+    echo "pushed temporalScale to deploy@$ip"
 }
 
 # Runs on each host: identity, systemd state, reachability of every peer
@@ -85,7 +87,7 @@ usage() {
 ./lab.sh up              build and start the lab, then check it
 ./lab.sh check           ssh, systemd, reachability and Postgres
 ./lab.sh ssh 01|02 [cmd] ssh to a host as deploy
-./lab.sh push 01|02      copy the project and temporal.env to ~/temporal-v6
+./lab.sh push 01|02      copy the project and temporal.env to ~/temporalScale
 ./lab.sh psql            psql as temporal inside tlab-pg
 ./lab.sh stop | start    power off / on (everything is kept)
 ./lab.sh down            remove containers, keep volumes (a fresh root disk)

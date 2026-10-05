@@ -4,7 +4,7 @@
 set -euo pipefail
 
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-LOG_FILE=/var/log/temporal-v6.log
+LOG_FILE=/var/log/temporalScale.log
 TEMPORAL_HOME=/opt/temporal
 CHANGED=false
 
@@ -64,7 +64,7 @@ detect_host_ip() {
 
 # Create TMP_DIR under the given parent and remove it when the script exits
 make_tmp_dir() {
-    TMP_DIR=$(mktemp -d "${1:-/tmp}/.temporal-v6.XXXXXX")
+    TMP_DIR=$(mktemp -d "${1:-/tmp}/.temporalScale.XXXXXX")
     trap 'rm -rf "$TMP_DIR"' EXIT
 }
 

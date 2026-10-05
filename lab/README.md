@@ -3,10 +3,10 @@
 Two fresh Ubuntu 24.04 VPSes and a Postgres box on the private network `tlab` (10.77.0.0/24).
 Git-ignored. The course is in `../docs/ops-curriculum.md`.
 
-| Host | IP | What it is |
-|---|---|---|
-| tlab-01 | 10.77.0.11 | VPS A: systemd, sshd, `deploy` with sudo |
-| tlab-02 | 10.77.0.12 | VPS B: same |
+| Host    | IP         | What it is                                                                          |
+| ------- | ---------- | ----------------------------------------------------------------------------------- |
+| tlab-01 | 10.77.0.11 | VPS A: systemd, sshd, `deploy` with sudo                                            |
+| tlab-02 | 10.77.0.12 | VPS B: same                                                                         |
 | tlab-pg | 10.77.0.20 | postgres:17.11, user `temporal` / `tlabtemporal` (superuser in the lab only), empty |
 
 No ports are published. Your workstation reaches 10.77.0.x directly.
@@ -15,7 +15,7 @@ No ports are published. Your workstation reaches 10.77.0.x directly.
 ./lab.sh up          # build, start, check
 ./lab.sh ssh 01      # deploy@tlab-01
 ./lab.sh psql
-./lab.sh push 01     # copy the project to ~/temporal-v6 with HOST_IP set
+./lab.sh push 01     # copy the project to ~/temporalScale with HOST_IP set
 ./lab.sh ui-up       # ../compose.yaml inside tlab-01's network; open http://10.77.0.11
 ./lab.sh             # all commands
 ```
