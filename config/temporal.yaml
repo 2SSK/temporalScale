@@ -1,0 +1,92 @@
+# enable-template
+log:
+  stdout: true
+  level: {{ default "info" (env "LOG_LEVEL") }}
+
+persistence:
+  numHistoryShards: {{ env "NUM_HISTORY_SHARDS" }}
+  defaultStore: default
+  visibilityStore: visibility
+  datastores:
+    default:
+      sql:
+        pluginName: postgres12
+        databaseName: temporal
+        connectAddr: "{{ env "DB_HOST" }}:{{ env "DB_PORT" }}"
+        connectProtocol: tcp
+        user: "{{ env "DB_USER" }}"
+        password: "{{ env "DB_PASSWORD" }}"
+        maxConns: {{ env "DB_MAX_CONNS" }}
+        maxIdleConns: {{ env "DB_MAX_CONNS" }}
+        maxConnLifetime: 1h
+        tls:
+          enabled: {{ default "false" (env "DB_TLS") }}
+          enableHostVerification: true
+          serverName: "{{ env "DB_HOST" }}"
+    visibility:
+      sql:
+        pluginName: postgres12
+        databaseName: temporal_visibility
+        connectAddr: "{{ env "DB_HOST" }}:{{ env "DB_PORT" }}"
+        connectProtocol: tcp
+        user: "{{ env "DB_USER" }}"
+        password: "{{ env "DB_PASSWORD" }}"
+        maxConns: {{ env "DB_VISIBILITY_MAX_CONNS" }}
+        maxIdleConns: {{ env "DB_VISIBILITY_MAX_CONNS" }}
+        maxConnLifetime: 1h
+        tls:
+          enabled: {{ default "false" (env "DB_TLS") }}
+          enableHostVerification: true
+          serverName: "{{ env "DB_HOST" }}"
+
+global:
+  membership:
+    maxJoinDuration: 30s
+    broadcastAddress: "{{ env "HOST_IP" }}"
+  metrics:
+    prometheus:
+      framework: tally
+      timerType: histogram
+      listenAddress: 0.0.0.0:9091
+
+services:
+  frontend:
+    rpc:
+      grpcPort: 7233
+      membershipPort: 6933
+      httpPort: 7243
+      bindOnIP: 0.0.0.0
+  history:
+    rpc:
+      grpcPort: 7234
+      membershipPort: 6934
+      bindOnIP: 0.0.0.0
+  matching:
+    rpc:
+      grpcPort: 7235
+      membershipPort: 6935
+      bindOnIP: 0.0.0.0
+  worker:
+    rpc:
+      grpcPort: 7239
+      membershipPort: 6939
+      bindOnIP: 0.0.0.0
+
+clusterMetadata:
+  enableGlobalNamespace: false
+  failoverVersionIncrement: 10
+  masterClusterName: active
+  currentClusterName: active
+  clusterInformation:
+    active:
+      enabled: true
+      initialFailoverVersion: 1
+      rpcName: frontend
+      rpcAddress: 127.0.0.1:7233
+
+dcRedirectionPolicy:
+  policy: noop
+
+dynamicConfigClient:
+  filepath: /etc/temporal/dynamicconfig.yaml
+  pollInterval: 10s
