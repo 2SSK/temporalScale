@@ -82,17 +82,17 @@ is not guaranteed safe: prefer fixing forward.
 
 ## Incidents
 
-| Symptom                              | Check                                                    | Action                                                               |
-| ------------------------------------ | -------------------------------------------------------- | -------------------------------------------------------------------- |
-| A script fails                       | Its `ERROR:` line                                        | Nothing was applied past the failing step; fix and re-run            |
-| Frontend not healthy after restart   | `journalctl -u temporal -n 100`                          | DB reachability and credentials first                                |
-| `history ring has 1 of N`            | `status.sh` on each server, `iptables -S TEMPORAL_INPUT` | Same `CLUSTER_IPS` everywhere; 6933-6939 open between servers        |
-| `TemporalScaleShardsUnowned`   | `status.sh` everywhere                                   | A server is up but not owning shards; restart it                     |
-| `TemporalScaleMembershipChurn` | `journalctl -u temporal`                                 | Crash loop or flapping network between servers                       |
-| PostgreSQL down                      | `pg_isready -h $DB_HOST`                                 | Whole cluster stops; fail over the database, Temporal reconnects     |
-| Server down                          | `numshards_gauge` on the others                          | Survivors take its shards; fix or replace it with `deploy.sh`        |
-| Memory near MemoryHigh               | `status.sh`                                              | Bigger profile or another server                                     |
-| Locked out                           | Cloud console                                            | Port 22 is always open in `TEMPORAL_INPUT`; check the cloud firewall |
+| Symptom                            | Check                                                    | Action                                                               |
+| ---------------------------------- | -------------------------------------------------------- | -------------------------------------------------------------------- |
+| A script fails                     | Its `ERROR:` line                                        | Nothing was applied past the failing step; fix and re-run            |
+| Frontend not healthy after restart | `journalctl -u temporal -n 100`                          | DB reachability and credentials first                                |
+| `history ring has 1 of N`          | `status.sh` on each server, `iptables -S TEMPORAL_INPUT` | Same `CLUSTER_IPS` everywhere; 6933-6939 open between servers        |
+| Shards unowned                     | `status.sh` everywhere                                   | A server is up but not owning shards; restart it                     |
+| Membership churn                   | `journalctl -u temporal`                                 | Crash loop or flapping network between servers                       |
+| PostgreSQL down                    | `pg_isready -h $DB_HOST`                                 | Whole cluster stops; fail over the database, Temporal reconnects     |
+| Server down                        | `numshards_gauge` on the others                          | Survivors take its shards; fix or replace it with `deploy.sh`        |
+| Memory near MemoryHigh             | `status.sh`                                              | Bigger profile or another server                                     |
+| Locked out                         | Cloud console                                            | Port 22 is always open in `TEMPORAL_INPUT`; check the cloud firewall |
 
 Bursts of `shard status unknown` errors in the first seconds after a restart are shard loading and normal.
 

@@ -27,7 +27,7 @@ Prometheus ── :9091, :9100 ──► every server
 | `config/journald.conf`, `config/rsyslog-temporal.conf`        | Log size cap; Temporal kept out of syslog                                        |
 | `compose.yaml`                                                | Web UI container (server-01)                                                     |
 | `scripts/`                                                    | Everything you run; see the runbook                                              |
-| `lab/`                                                        | Local two-VPS lab (git-ignored)                                                  |
+| `lab/`                                                        | Local two-VPS lab                                                                |
 
 ## What lands on a server
 
@@ -38,7 +38,7 @@ Prometheus ── :9091, :9100 ──► every server
 | `/opt/temporal/cli/<version>/temporal`                      | root          | Temporal CLI                                                                                    |
 | `/etc/temporal/`                                            | root:temporal | `temporal.yaml`, `temporal.env` (0600), `dynamicconfig.yaml`, `profile.yaml`, `firewall*.rules` |
 | `/etc/nginx/conf.d/temporal.conf` + `temporal-*-allow.conf` | root          | nginx site and generated allow lists                                                            |
-| `/var/log/temporalScale.log`                        | root          | Log of every script run                                                                         |
+| `/var/log/temporalScale.log`                                | root          | Log of every script run                                                                         |
 
 The server runs as the `temporal` system user, which can read but not change its binary or config.
 Logs: `journalctl -u temporal` (capped at 1 GB / 2 weeks).
@@ -70,7 +70,7 @@ Scripts validate `.env` before acting (password characters, `DB_TLS`, shard coun
 | 4c16g   | 13000M / 14000M  | 8600MiB    | 2 GiB         | 1 GiB        | 50 + 10          | 4096                |
 | 8c32g   | 27000M / 29000M  | 18000MiB   | 4 GiB         | 2 GiB        | 80 + 10          | 8192                |
 
-- `GOMEMLIMIT` is two thirds of `MemoryHigh`; a tighter gap caused the 2026-09-09 temporal-A1 outage.
+- `GOMEMLIMIT` is two thirds of `MemoryHigh`; a tighter gap has caused an outage.
 - Caches are bounded in bytes per host, so memory does not grow with the shard count (an idle shard is
   about 150 KB, measured).
 - `reload-temporal.sh` refuses a profile larger than the host and warns when one server down would push
@@ -131,13 +131,14 @@ behind nginx on :80 restricted to `ADMIN_IPS`. Other servers return 502 on `/`.
 
 ## Monitoring
 
-Prometheus scrapes every server directly on 9091 and 9100. Alerts to define: unowned shards, membership
-churn, persistence errors and latency, server errors, host memory, CPU headroom for one-server-down, clock
-sync. Node-down is covered by `TemporalServerDown`.
+Prometheus scrapes every server directly on 9091 and 9100. No alert rules ship with this project; define
+them for: server down, unowned shards, membership churn, persistence errors and latency, server errors,
+host memory, CPU headroom for one-server-down, clock sync.
 
 ## Lab
 
-`lab/` (git-ignored) runs two Ubuntu 24.04 systemd containers (10.77.0.11, 10.77.0.12) and PostgreSQL
-17.11 (10.77.0.20); the workstation (10.77.0.1) is client, monitor and admin. `lab/lab.sh push 01` copies
-the project with `lab/temporal.env` as `.env`; `lab/lab.sh ui-up` runs the UI in tlab-01's network.
-Shared kernel and clock: no clock-skew, kernel or cloud-init testing.
+`lab/` (driven by `make` from the root) runs two Ubuntu 24.04 systemd containers (10.78.0.11,
+10.78.0.12) and PostgreSQL 17.11 (10.78.0.20); the workstation (10.78.0.1) is client, monitor and
+admin. `lab/lab.sh push 01` copies the project with `lab/temporal.env` as `.env`; `lab/lab.sh ui-up`
+runs the UI in tscale-01's network. Shared kernel and clock: no clock-skew, kernel or cloud-init
+testing.

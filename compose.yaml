@@ -1,7 +1,7 @@
 # compose.yaml - Temporal Web UI (docker, host network) on the server that runs the frontend.
 services:
     temporal-ui:
-        container_name: temporal-ui
+        container_name: temporalscale-temporal-ui
         image: temporalio/ui:${TEMPORAL_UI_VERSION:-2.54.1}
         restart: unless-stopped
         network_mode: ${UI_NETWORK_MODE:-host}
