@@ -1,44 +1,35 @@
-# The desired state of environment lab. Edit every value, then: tops -e lab validate
-# The addresses below are documentation addresses (192.0.2.0/24): nothing answers there.
-
-cluster: lab # the Temporal cluster name, fixed at first start
-
+# VPSLAB (tops/lab): one cluster at a time, shared with tops' e2e suite.
+cluster: tscale-lab
 temporal:
-  version: 1.31.3 # the server release; after the first start, change it with tops -e lab upgrade
-  cli: 1.9.1 # the temporal CLI release
-  # logLevel: info # debug, info, warn or error
-
-shards: 512 # fixed when the cluster is created
-
+  version: 1.31.3
+  cli: 1.9.1
+  logLevel: info
+shards: 512
 persistence:
   postgres:
-    host: 192.0.2.20
-    # port: 5432
-    user: temporal # its password is TOPS_PG_PASSWORD in secrets.env
-    # tls: false
-    # adminDatabase: postgres
-
+    host: 10.80.0.20
+    port: 5432
+    user: temporal
+    tls: false
 ssh:
-  user: deploy # needs passwordless sudo on every node
-  # port: 22
-  # key: keys/id_ed25519 # relative to this directory; without it, the ssh agent is used
-  # knownHosts: ~/.ssh/known_hosts
-
-# Sources allowed through each node's firewall.
+  user: deploy
+  key: ../../lab/keys/id_ed25519
+  knownHosts: ../../lab/keys/known_hosts
 access:
-  clients: [] # workers and starters: port 7233
-  monitors: [] # Prometheus: ports 9233-9239 and 9100
-  admins: [] # operators: port 80
-  healthchecks: [] # load balancers: port 80
-
+  clients: [10.80.0.1]
+  monitors: [10.80.0.1]
+  admins: [10.80.0.1]
+  healthchecks: []
 namespaces:
-  - { name: default, retention: 72h }
-
-# Every role must run on some node. Names and addresses are unique.
+  - { name: defaults, retention: 72h }
+  - { name: drills, retention: 24h }
 nodes:
-  - name: node-01
-    address: 192.0.2.11
+  - name: vps-01
+    address: 10.80.0.11
     roles: [frontend, history, matching, worker]
-  - name: node-02
-    address: 192.0.2.12
+  - name: vps-02
+    address: 10.80.0.12
     roles: [frontend, history, matching, worker]
+  - name: vps-03
+    address: 10.80.0.13
+    roles: [frontend, matching]

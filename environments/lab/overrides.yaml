@@ -1,1 +1,4 @@
-{}
+frontend.namespaceRPS:
+  - value: 400
+    constraints: { namespace: drills }
+  - value: 2400

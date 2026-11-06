@@ -1,1 +1,10 @@
-{}
+limit.maxIDLength:
+  - value: 255
+frontend.shutdownFailHealthCheckDuration:
+  - value: 10s
+frontend.shutdownDrainDuration:
+  - value: 30s
+matching.shutdownDrainDuration:
+  - value: 10s
+history.shutdownDrainDuration:
+  - value: 10s
