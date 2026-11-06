@@ -1,2 +1,1 @@
-.env
-AGENTS.md
+environments/*/secrets.env

@@ -1,0 +1,44 @@
+# The desired state of environment lab. Edit every value, then: tops -e lab validate
+# The addresses below are documentation addresses (192.0.2.0/24): nothing answers there.
+
+cluster: lab # the Temporal cluster name, fixed at first start
+
+temporal:
+  version: 1.31.3 # the server release; after the first start, change it with tops -e lab upgrade
+  cli: 1.9.1 # the temporal CLI release
+  # logLevel: info # debug, info, warn or error
+
+shards: 512 # fixed when the cluster is created
+
+persistence:
+  postgres:
+    host: 192.0.2.20
+    # port: 5432
+    user: temporal # its password is TOPS_PG_PASSWORD in secrets.env
+    # tls: false
+    # adminDatabase: postgres
+
+ssh:
+  user: deploy # needs passwordless sudo on every node
+  # port: 22
+  # key: keys/id_ed25519 # relative to this directory; without it, the ssh agent is used
+  # knownHosts: ~/.ssh/known_hosts
+
+# Sources allowed through each node's firewall.
+access:
+  clients: [] # workers and starters: port 7233
+  monitors: [] # Prometheus: ports 9233-9239 and 9100
+  admins: [] # operators: port 80
+  healthchecks: [] # load balancers: port 80
+
+namespaces:
+  - { name: default, retention: 72h }
+
+# Every role must run on some node. Names and addresses are unique.
+nodes:
+  - name: node-01
+    address: 192.0.2.11
+    roles: [frontend, history, matching, worker]
+  - name: node-02
+    address: 192.0.2.12
+    roles: [frontend, history, matching, worker]
